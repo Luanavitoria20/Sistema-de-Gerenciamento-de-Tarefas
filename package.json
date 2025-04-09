@@ -1,0 +1,24 @@
+{
+  "name": "sistema-de-gerenciamento-de-tarefas",
+  "version": "1.0.0",
+  "description": "Sistema de Gerenciamento de Tarefas : Trabalha 01 de JavaScript Amontada Valley",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luanavitoria20/Sistema-de-Gerenciamento-de-Tarefas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Luanavitoria20/Sistema-de-Gerenciamento-de-Tarefas/issues"
+  },
+  "homepage": "https://github.com/Luanavitoria20/Sistema-de-Gerenciamento-de-Tarefas#readme",
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
+  }
+}
