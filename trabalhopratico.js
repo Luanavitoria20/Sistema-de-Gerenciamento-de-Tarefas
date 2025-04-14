@@ -1,134 +1,138 @@
-const fs = require('fs/promises');
-const prompt = require('prompt-sync')();
+import { readFile, writeFile } from 'fs/promises';
+import promptSync from 'prompt-sync';
 
-const ARQUIVO_TAREFAS = 'tarefas.json';
+const prompt = promptSync();
+const FILE = 'tarefas.json';
 
-// Função para ler as tarefas do arquivo
+// Lê tarefas do arquivo ou retorna array vazio se não existir
 async function lerTarefas() {
-    try {
-        const dados = await fs.readFile(ARQUIVO_TAREFAS, 'utf-8');
-        return JSON.parse(dados);
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            // Arquivo não existe, retorna lista vazia
-            return [];
-        } else {
-            throw error;
-        }
+  try {
+    const dados = await readFile(FILE, 'utf-8');
+    return JSON.parse(dados);
+  } catch (erro) {
+    if (erro.code === 'ENOENT') {
+      return [];
+    } else {
+      console.error('Erro ao ler o arquivo:', erro.message);
+      return [];
     }
+  }
 }
 
-// Função para salvar tarefas no arquivo
+// Salva tarefas no arquivo
 async function salvarTarefas(tarefas) {
-    await fs.writeFile(ARQUIVO_TAREFAS, JSON.stringify(tarefas, null, 2));
+  try {
+    await writeFile(FILE, JSON.stringify(tarefas, null, 2));
+  } catch (erro) {
+    console.error('Erro ao salvar o arquivo:', erro.message);
+  }
 }
 
-// Função para gerar novo ID
-function gerarNovoId(tarefas) {
-    if (tarefas.length === 0) return 1;
-    const ids = tarefas.map(t => t.id);
-    return Math.max(...ids) + 1;
-}
-
-// Menu interativo
-async function menu() {
-    let opcao;
-    do {
-        console.log('\n--- GERENCIADOR DE TAREFAS ---');
-        console.log('1. Criar uma nova tarefa');
-        console.log('2. Visualizar todas as tarefas');
-        console.log('3. Visualizar apenas tarefas concluídas');
-        console.log('4. Visualizar apenas tarefas não concluídas');
-        console.log('5. Concluir uma tarefa');
-        console.log('6. Sair');
-        opcao = prompt('Escolha uma opção: ');
-
-        switch (opcao) {
-            case '1':
-                await criarTarefa();
-                break;
-            case '2':
-                await listarTarefas();
-                break;
-            case '3':
-                await listarTarefas(true);
-                break;
-            case '4':
-                await listarTarefas(false);
-                break;
-            case '5':
-                await concluirTarefa();
-                break;
-            case '6':
-                console.log('Saindo...');
-                break;
-            default:
-                console.log('Opção inválida!');
-        }
-    } while (opcao !== '6');
+// Gera novo ID único e sequencial
+function gerarId(tarefas) {
+  if (tarefas.length === 0) return 1;
+  const ids = tarefas.map(t => t.id);
+  return Math.max(...ids) + 1;
 }
 
 // Criar nova tarefa
 async function criarTarefa() {
-    const titulo = prompt('Título da tarefa: ');
-    const descricao = prompt('Descrição da tarefa: ');
-    const tarefas = await lerTarefas();
-    const novaTarefa = {
-        id: gerarNovoId(tarefas),
-        titulo,
-        descricao,
-        concluida: false
-    };
-    tarefas.push(novaTarefa);
-    await salvarTarefas(tarefas);
-    console.log('Tarefa criada com sucesso!');
+  const titulo = prompt('Título da tarefa: ');
+  const descricao = prompt('Descrição da tarefa: ');
+  const tarefas = await lerTarefas();
+
+  const novaTarefa = {
+    id: gerarId(tarefas),
+    titulo,
+    descricao,
+    concluida: false
+  };
+
+  tarefas.push(novaTarefa);
+  await salvarTarefas(tarefas);
+  console.log('✅ Tarefa criada com sucesso!');
 }
 
-// Listar tarefas (todas, concluídas ou não concluídas)
-async function listarTarefas(filtrarConcluidas = null) {
-    const tarefas = await lerTarefas();
-    let tarefasFiltradas = tarefas;
+// Listar tarefas com opção de filtro
+async function listarTarefas(filtro = null) {
+  const tarefas = await lerTarefas();
 
-    if (filtrarConcluidas === true) {
-        tarefasFiltradas = tarefas.filter(t => t.concluida);
-    } else if (filtrarConcluidas === false) {
-        tarefasFiltradas = tarefas.filter(t => !t.concluida);
-    }
+  const resultado = filtro === null
+    ? tarefas
+    : tarefas.filter(t => t.concluida === filtro);
 
-    if (tarefasFiltradas.length === 0) {
-        console.log('Nenhuma tarefa encontrada.');
-    } else {
-        console.log('\n--- Lista de Tarefas ---');
-        for (const t of tarefasFiltradas) {
-            console.log(`ID: ${t.id}`);
-            console.log(`Título: ${t.titulo}`);
-            console.log(`Descrição: ${t.descricao}`);
-            console.log(`Concluída: ${t.concluida ? 'Sim' : 'Não'}`);
-            console.log('---------------------------');
-        }
-    }
+  if (resultado.length === 0) {
+    console.log('Nenhuma tarefa encontrada.');
+    return;
+  }
+
+  resultado.forEach(t => {
+    console.log('\nID:', t.id);
+    console.log('Título:', t.titulo);
+    console.log('Descrição:', t.descricao);
+    console.log('Concluída:', t.concluida ? 'Sim' : 'Não');
+  });
 }
 
 // Concluir uma tarefa
 async function concluirTarefa() {
-    const id = parseInt(prompt('Digite o ID da tarefa a concluir: '));
-    const tarefas = await lerTarefas();
-    const tarefa = tarefas.find(t => t.id === id);
+  const id = parseInt(prompt('Digite o ID da tarefa que deseja concluir: '));
+  const tarefas = await lerTarefas();
 
-    if (!tarefa) {
-        console.log('Tarefa não encontrada.');
-        return;
-    }
+  const tarefa = tarefas.find(t => t.id === id);
+  if (!tarefa) {
+    console.log('❌ Tarefa não encontrada.');
+    return;
+  }
 
-    if (tarefa.concluida) {
-        console.log('Tarefa já está concluída.');
-        return;
-    }
+  if (tarefa.concluida) {
+    console.log('⚠️ Essa tarefa já está concluída.');
+    return;
+  }
 
-    tarefa.concluida = true;
-    await salvarTarefas(tarefas);
-    console.log('Tarefa marcada como concluída!');
+  tarefa.concluida = true;
+  await salvarTarefas(tarefas);
+  console.log('✅ Tarefa marcada como concluída!');
 }
 
-// Executar o programa
-menu().catch(err => console.error('Erro inesperado:', err));
+// Menu principal
+async function menu() {
+  let opcao;
+  do {
+    console.log('\n==== MENU ====');
+    console.log('1 - Criar nova tarefa');
+    console.log('2 - Visualizar todas as tarefas');
+    console.log('3 - Visualizar tarefas concluídas');
+    console.log('4 - Visualizar tarefas não concluídas');
+    console.log('5 - Concluir uma tarefa');
+    console.log('6 - Sair');
+
+    opcao = prompt('Escolha uma opção: ');
+
+    switch (opcao) {
+      case '1':
+        await criarTarefa();
+        break;
+      case '2':
+        await listarTarefas();
+        break;
+      case '3':
+        await listarTarefas(true);
+        break;
+      case '4':
+        await listarTarefas(false);
+        break;
+      case '5':
+        await concluirTarefa();
+        break;
+      case '6':
+        console.log('👋 Saindo...');
+        break;
+      default:
+        console.log('⚠️ Opção inválida. Tente novamente.');
+    }
+  } while (opcao !== '6');
+}
+
+// Iniciar sistema
+menu();
