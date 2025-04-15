@@ -1,15 +1,20 @@
 [
-    {
-      "id": 1,
-      "titulo": "Estudar JavaScript",
-      "descricao": "Praticar async/await e fs/promises",
-      "concluida": false
-    },
-    {
-      "id": 2,
-      "titulo": "Finalizar projeto",
-      "descricao": "Entregar código na plataforma",
-      "concluida": true
-    }
-  ]
-  
+  {
+    "id": 1,
+    "titulo": "Estudar JavaScript",
+    "descricao": "Praticar async/await e fs/promises",
+    "concluida": false
+  },
+  {
+    "id": 2,
+    "titulo": "Finalizar projeto",
+    "descricao": "Entregar código na plataforma",
+    "concluida": true
+  },
+  {
+    "id": 3,
+    "titulo": "fazer almoo",
+    "descricao": "receita]",
+    "concluida": false
+  }
+]

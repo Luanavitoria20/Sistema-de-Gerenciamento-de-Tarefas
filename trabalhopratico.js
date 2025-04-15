@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'fs/promises';
 import promptSync from 'prompt-sync';
 
 const prompt = promptSync();
-const FILE = 'tarefas.json';
+const FILE = './JSON/tarefas.json';
 
 // Lê tarefas do arquivo ou retorna array vazio se não existir
 async function lerTarefas() {
@@ -33,7 +33,7 @@ function gerarId(tarefas) {
   if (tarefas.length === 0) return 1;
   const ids = tarefas.map(t => t.id);
   return Math.max(...ids) + 1;
-}
+} 
 
 // Criar nova tarefa
 async function criarTarefa() {
