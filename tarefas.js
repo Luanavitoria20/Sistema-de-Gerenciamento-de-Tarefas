@@ -1,8 +1,8 @@
 import { readFile, writeFile } from 'fs/promises';
-const prompt = require("prompt-sync")();
+import promptSync from 'prompt-sync';
 
-// Caminho do arquivo de tarefas
-const caminhoArquivo = './tarefas.json';
+const prompt = promptSync();
+const caminhoArquivo = './JSON/tarefas.json';
 
 // Função para ler tarefas do arquivo JSON
 async function lerTarefas() {
