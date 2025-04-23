@@ -1,8 +1,9 @@
 import { readFile, writeFile } from 'fs/promises';
+// ler e escrever arquivos de forma assíncrona
 import promptSync from 'prompt-sync';
-
+//permiter fazer perguntas  ao usuario no terminal
 const prompt = promptSync();
-const caminhoArquivo = './JSON/tarefas.json';
+const caminhoArquivo = './JSON/tarefas.json'; 
 
 // Função para ler tarefas do arquivo JSON
 async function lerTarefas() {
